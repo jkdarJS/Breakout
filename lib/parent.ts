@@ -9,7 +9,6 @@ export class Parent {
             scene: scene,
             children: []
         }
-        this.config.scene.config.children.push(this);
     }
 
     add(node: Node) {
