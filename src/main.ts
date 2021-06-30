@@ -1,4 +1,5 @@
 import { Circle } from "../lib/circle.js";
+import { Vector2DConfig } from "../lib/config.js";
 import { Group } from "../lib/group.js";
 import { Size, Vector2D } from "../lib/math.js";
 import { RoundRect } from "../lib/rectangle.js";
@@ -53,18 +54,57 @@ function getGame(): Group{
         color: "rgb(0, 255, 0)"
     }
 
+    var paddelX = playerCfg.pos.x + playerCfg.size.width /2;
+    var paddelY = playerCfg.pos.y - 15;
+    let paddelCfg = {
+        pos: new Vector2D(paddelX, paddelY),
+        radius: 15,
+        color: "rgb(20, 200, 200)",
+        velX: 1,
+        velY: 1
+    }
+
+    enum PaddelDir {
+        RIGHT_UP, LEFT_UP, RIGHT_DOWN, LEFT_DOWN
+    }
+
+    class Paddel extends Circle {
+        dir: number;
+        constructor(position: Vector2D | Vector2DConfig, radius: number) {
+            super(position, radius);
+        }
+
+        move() {
+            switch(this.dir) {
+                case PaddelDir.RIGHT_UP:
+                    break;
+                case PaddelDir.LEFT_UP:
+                    break;
+                case PaddelDir.RIGHT_DOWN:
+                    break;
+                case PaddelDir.LEFT_DOWN:
+                    break;
+            }
+        }
+    }
+
     var game: Group;
     var player: RoundRect;
     var particulars: RoundRect[];
-    var bullet: Circle[];
+    var paddels: Circle[];
+    var paddel: Circle;
 
     function initGame() {
         particulars = [];
-        bullet = [];
+        paddels = [];
 
         game = new Group(config.pos, config.size);
         game.style.borderColor = config.color;
         game.style.borderWidth = 2;
+
+        paddel = new Circle(paddelCfg.pos, paddelCfg.radius);
+        paddel.style.fillColor = paddelCfg.color;
+        paddels.push(paddel);
 
         player = new RoundRect(playerCfg.pos, playerCfg.size);
         player.style.fillColor = playerCfg.color;
@@ -80,6 +120,11 @@ function getGame(): Group{
         });
 
         game.add(player);
+        game.add(paddel);
+    }
+
+    function movePaddels() {
+
     }
 
     initGame();
