@@ -21,6 +21,10 @@ export class Drawer {
         }
     }
 
+    clear() {
+        this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+    }
+
     draw(node: Node): void{
         const style = node.style;
         const path = node.getPath();

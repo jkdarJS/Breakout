@@ -2,14 +2,18 @@ import { Circle } from "../lib/circle.js";
 import { Vector2DConfig } from "../lib/config.js";
 import { Group } from "../lib/group.js";
 import { Size, Vector2D } from "../lib/math.js";
+import { Node } from "../lib/node.js";
 import { RoundRect } from "../lib/rectangle.js";
 import { Scene } from "../lib/scene.js";
+import { Paddle } from "../paddel.js";
 
 
 var canvas: HTMLCanvasElement;
 var scene: Scene;
 var group: Group;
 var game: Group;
+var ball: Paddle;
+var start: boolean = false;
 
 function init() {
     canvas = document.querySelector("canvas");
@@ -22,11 +26,37 @@ function init() {
     group.style.fillColor = "rgb(0, 0, 0)";
 
     game = getGame();
+    
+    var rect = game.children[0] as RoundRect
+    var paddelX = rect.position.x + rect.size.width /2;
+    var paddelY = rect.position.y - 15;
+
+    ball = new Paddle(new Vector2D(paddelX, paddelY), 15);
+    ball.style.fillColor = "rgb(20, 200, 200)";
+    ball.setVel(rect);
+
+    game.add(ball);
 
     group.add(game);
     scene.add(group);
 
     scene.show();
+
+    game.event.onClick(() => {
+        start = true;
+    })
+
+    function update() {
+        scene.hide();
+        if(start) {
+            ball.update(rect);
+        }
+        scene.show();
+        requestAnimationFrame(update);
+    }
+
+    update();
+
 }
 
 function getGame(): Group{
@@ -48,51 +78,18 @@ function getGame(): Group{
         y2: config.pos.y + config.size.height
     }
 
+    var playerX = (config.size.width - 100) /2;
+    var playerY = config.size.height - 50;
     let playerCfg = {
-        pos: new Vector2D((config.size.width - 100) /2, config.size.height - 50), 
+        pos: new Vector2D(playerX, playerY), 
         size: new Size(100, 25),
         color: "rgb(0, 255, 0)"
-    }
-
-    var paddelX = playerCfg.pos.x + playerCfg.size.width /2;
-    var paddelY = playerCfg.pos.y - 15;
-    let paddelCfg = {
-        pos: new Vector2D(paddelX, paddelY),
-        radius: 15,
-        color: "rgb(20, 200, 200)",
-        velX: 1,
-        velY: 1
-    }
-
-    enum PaddelDir {
-        RIGHT_UP, LEFT_UP, RIGHT_DOWN, LEFT_DOWN
-    }
-
-    class Paddel extends Circle {
-        dir: number;
-        constructor(position: Vector2D | Vector2DConfig, radius: number) {
-            super(position, radius);
-        }
-
-        move() {
-            switch(this.dir) {
-                case PaddelDir.RIGHT_UP:
-                    break;
-                case PaddelDir.LEFT_UP:
-                    break;
-                case PaddelDir.RIGHT_DOWN:
-                    break;
-                case PaddelDir.LEFT_DOWN:
-                    break;
-            }
-        }
     }
 
     var game: Group;
     var player: RoundRect;
     var particulars: RoundRect[];
     var paddels: Circle[];
-    var paddel: Circle;
 
     function initGame() {
         particulars = [];
@@ -102,29 +99,24 @@ function getGame(): Group{
         game.style.borderColor = config.color;
         game.style.borderWidth = 2;
 
-        paddel = new Circle(paddelCfg.pos, paddelCfg.radius);
-        paddel.style.fillColor = paddelCfg.color;
-        paddels.push(paddel);
-
         player = new RoundRect(playerCfg.pos, playerCfg.size);
         player.style.fillColor = playerCfg.color;
 
         game.event.onMove((e: MouseEvent) => {
-            const MOUSE_POS = game.getMousePosToNode(e);
-            const playerPos = {
-                x1: player.position.x,
-                y1: player.position.y,
-                x2: player.position.x + player.size.width,
-                y2: player.position.y + player.size.height
+            
+            const MOUSE_POS = {x: e.clientX, y: e.clientY};
+            
+            const gamePos = {
+                x1: game.position.x + player.size.width/2 + 10,
+                x2: game.position.x + game.size.width - player.size.width/2 - 10
+            }
+
+            if(MOUSE_POS.x > gamePos.x1 && MOUSE_POS.x < gamePos.x2) {
+                player.position.x = MOUSE_POS.x - game.position.x - player.size.width/2;
             }
         });
 
         game.add(player);
-        game.add(paddel);
-    }
-
-    function movePaddels() {
-
     }
 
     initGame();

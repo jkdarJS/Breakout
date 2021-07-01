@@ -49,4 +49,7 @@ export class Scene {
     show() {
         this.draw();
     }
+    hide() {
+        this.getDrawer().clear();
+    }
 }
