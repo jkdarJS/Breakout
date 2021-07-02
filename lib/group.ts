@@ -8,8 +8,21 @@ export class Group extends Rectangle {
         super(position, size);
     }
 
+    remove(node: Node) {
+        for (let i = 0; i < this.children.length; i++) {
+            const elem = this.children[i];
+            if(elem != node) continue;
+            this.children.splice(i, 1);
+            break;
+        }
+    }
+
     add(node: Node) {
         this.children.push(node);
         node.parent = this;
+    }
+
+    update(): void{
+
     }
 }
