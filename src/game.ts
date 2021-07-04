@@ -2,6 +2,7 @@ import { Group } from "../lib/group.js";
 import { Image } from "../lib/image.js";
 import { Size, Vector2D } from "../lib/math.js";
 import { RoundRect } from "../lib/rectangle.js";
+import { Text } from "../lib/text.js";
 import { Ball, ColliedDir } from "./ball.js";
 
 export class Game extends Group{
@@ -11,12 +12,17 @@ export class Game extends Group{
     paddel: RoundRect;
     arrow: Image;
     GAME_STATE: number = GameState.UNPLAYED;
+    startText: Text;
 
     constructor(position: Vector2D, size: Size) {
         super(position, size);
         this.style.borderColor = "rgb(0, 255, 255)";
         this.style.borderWidth = 2;
 
+        var txtX = this.position.x + this.size.width/2;
+        var txtY = this.position.y + this.size.height/2;
+        this.startText = new Text(new Vector2D(txtX, txtY), "Start!");
+        
         //init Paddel
         var playerX = (this.size.width - 100) /2;
         var playerY = this.size.height - 35;
@@ -35,8 +41,10 @@ export class Game extends Group{
         const arrowX = this.paddel.position.x + this.paddel.size.width/2 - SIZE/2;
         const arrowY = this.paddel.position.y - SIZE - BALL_RADIUS*3;
         this.arrow = new Image("../assets/arrowUp.svg.png", new Vector2D(arrowX, arrowY), new Size(SIZE, SIZE));
-        this.arrow.style.rotation = -85;
         this.arrow.style.rotateAngel = new Vector2D(this.arrow.size.width/2, this.arrow.size.height);
+        this.arrow.style.borderColor = "rgb(0, 0, 255)";
+        this.arrow.style.fillColor = "rgb(0, 0, 100)";
+        this.arrow.style.borderWidth = 2;
 
         //add Ball to Balls
         this.balls.push(ball);
@@ -60,14 +68,16 @@ export class Game extends Group{
 
         //Create new Particulars
         for (let x = 0; x < NUM_COLUMNS; x++) {
+            var red = 60;
             for (let y = 0; y < NUM_ROWS; y++) {
                 var px = x * PARTICULARS_WIDTH + START_X + (SPACE * x);
                 var py = y * PARTICULARS_HEIGHT + START_Y + (SPACE * y);
                 var pos = new Vector2D(px, py);
                 var partic = new RoundRect(pos, new Size(PARTICULARS_WIDTH, PARTICULARS_HEIGHT));
-                partic.style.fillColor = "rgb(255, 0, 0)";
+                partic.style.fillColor = "rgb(" + red + ", 0, 0)";
                 this.particulars.push(partic);
                 this.add(partic);
+                red += 10;
             }
         }
 
@@ -78,6 +88,9 @@ export class Game extends Group{
 
         //add Image of ArrowUp
         this.add(this.arrow);
+
+        //add startText to Game
+        this.add(this.startText);
 
         //move Paddel
         this.event.onMove((e: MouseEvent) => {
@@ -93,24 +106,29 @@ export class Game extends Group{
                     this.paddel.position.x = MOUSE_POS.x - this.position.x - this.paddel.size.width/2;
                 }
             }
+
+            //rotate arrow
             if(this.GAME_STATE == GameState.UNPLAYED) {
-                var arrowX = this.position.x + this.arrow.size.width/2;
-                var arrowY = this.position.y + this.arrow.size.height/2;
+                var arrowX = this.arrow.position.x + this.arrow.size.width/2;
+                var arrowY = this.arrow.position.y + this.arrow.size.height;
                 var MOUSE = this.getMousePosToNode(e);
                 
-                var distX = Math.abs(arrowX - MOUSE.x);
-                var distY = Math.abs(arrowY - MOUSE.y);
-                var c = Math.sqrt(distX * distX + distY * distY);
-                var degree = Math.acos(distX/c) * (180/Math.PI);
-                // console.log(degree);
-                
-                this.arrow.style.rotation = degree;
+                if(MOUSE.y <= arrowY) {
+                    var distX = arrowX - MOUSE.x;
+                    var distY = arrowY - MOUSE.y;
+                    var c = Math.sqrt(distX * distX + distY * distY);
+                    var degree = Math.asin(-distX/c) * (180/Math.PI);
+                    if(degree <= 65 && degree >= -65) {
+                        this.arrow.style.rotation = degree;
+                    }
+                }
             }
         });
         
-        this.event.onClick(() => {
+        this.event.onClick((e: MouseEvent) => {
             this.GAME_STATE = GameState.RUNNING;
             this.remove(this.arrow);
+            this.remove(this.startText);
         });
     }
 
@@ -141,13 +159,24 @@ export class Game extends Group{
     }
 
     update() {
-        this.balls.forEach(ball => {
+        for (let i = 0; i < this.balls.length; i++) {
+            const ball = this.balls[i];
             ball.update(this.paddel);
             this.ballColiedsParticulars(ball);
-        });
+            var paddel = this.paddel;
+            if(ball.position.y > paddel.position.y + paddel.size.height) {
+                if(i > 0) {
+                    this.remove(ball);
+                } else {
+                    this.GAME_STATE = GameState.GAMEOVER;
+                }
+                this.balls.splice(i, 1);
+                i--;
+            }
+        }
     }
 }
 
 export enum GameState {
-    UNPLAYED, RUNNING, PAUSE
+    UNPLAYED, RUNNING, PAUSE, GAMEOVER
 }

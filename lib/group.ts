@@ -4,6 +4,7 @@ import { Rectangle } from "./rectangle.js";
 
 export class Group extends Rectangle {
     children: Node[] = [];
+     
     constructor(position: Vector2D, size: Size) {
         super(position, size);
     }

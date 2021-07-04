@@ -3,6 +3,7 @@ import { RoundRect } from "../lib/rectangle.js";
 export class Ball extends Circle {
     constructor(position, radius) {
         super(position, radius);
+        this.speed = 50; //min = 1, max = 100
         this.collidDir = -1;
         this.velX = 0;
         this.velY = 0;
@@ -99,7 +100,12 @@ export class Ball extends Circle {
             xPercent = 0;
             yPercent = 100;
         }
-        var speed = { x: x * xPercent / 8, y: y * yPercent / 8 };
+        if (this.speed > 100) {
+            this.speed = 100;
+        }
+        var velX = (x * xPercent / 5) * this.speed / 100;
+        var velY = (y * yPercent / 5) * this.speed / 100;
+        var speed = { x: velX, y: velY };
         return speed;
     }
     update(player) {
@@ -121,13 +127,13 @@ export class Ball extends Circle {
         else if (this.position.y + this.radius >= parentRect.height) {
             this.velY = -this.velY;
         }
+        this.position.x += this.velX;
+        this.position.y -= this.velY;
         if (this.collied(player)) {
             var vel = this.getVelocity(player);
             this.velX = vel.x;
             this.velY = vel.y;
         }
-        this.position.x += this.velX;
-        this.position.y -= this.velY;
     }
 }
 export var ColliedDir;

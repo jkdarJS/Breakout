@@ -19,7 +19,7 @@ function init() {
     group = new Group(new Vector2D(0, 0), new Size(canvas.width, canvas.height));
     group.style.fillColor = "rgb(0, 0, 0)";
 
-    game = new Game(new Vector2D((canvas.width-400)/2, (canvas.height-800)/2), new Size(400, 800));
+    game = new Game(new Vector2D((canvas.width-400)/2, (canvas.height-700)/2), new Size(400, 700));
     
     group.add(game);
     scene.add(group);

@@ -1,4 +1,5 @@
 import { NodeConfig, Vector2DConfig } from "./config.js";
+import { Drawer } from "./draw.js";
 import { Event } from "./event.js";
 import { Group } from "./group.js";
 import { Vector2D } from "./math.js";
@@ -40,10 +41,17 @@ export class Node implements NodeConfig{
     }
 
     getMousePosToNode(e: MouseEvent): Vector2D {
-        var nodePos = this.getPositionToScene();
+        var nodePos = this.position;
         var pos = new Vector2D()
         pos.x = e.clientX - nodePos.x;
         pos.y = e.clientY - nodePos.y;
         return pos;
+    }
+
+    draw(drawer: Drawer) {
+        drawer.ctx.fill(this.getPath());
+        if(this.style.borderWidth > 0) {
+            drawer.ctx.stroke(this.getPath());
+        }
     }
 }
