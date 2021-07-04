@@ -1,5 +1,6 @@
 import { SceneConfig } from "./config.js";
 import { Drawer } from "./draw.js";
+import { Grid } from "./grid.js";
 import { Group } from "./group.js";
 import { Node } from "./node.js";
 
@@ -14,6 +15,16 @@ export class Scene {
         };
     }
 
+    remove(group: Group) {
+        console.log(this.config.children);
+        for (let i = 0; i < this.config.children.length; i++) {
+            const elem = this.config.children[i];
+            if(elem != group) continue;
+            this.config.children.splice(i, 1);
+            break;
+        }
+    }
+
     add(group: Group) {
         this.config.children.push(group);
     }
@@ -26,12 +37,14 @@ export class Scene {
         var nodes: Node[] = [];
 
         function get(array: Node[]) {
-            array.forEach(node => {
+            for (let i = 0; i < array.length; i++) {
+                const node = array[i];
+                if(!node.visibility) continue;
                 nodes.push(node);
                 if(node instanceof Group) {
                     get(node.children);
                 }
-            });
+            }
         }
 
         get(this.config.children);

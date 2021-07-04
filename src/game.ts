@@ -1,7 +1,9 @@
+import { Button, ButtonImage } from "../lib/button.js";
 import { Group } from "../lib/group.js";
 import { Image } from "../lib/image.js";
 import { Size, Vector2D } from "../lib/math.js";
 import { RoundRect } from "../lib/rectangle.js";
+import { Scene } from "../lib/scene.js";
 import { Text } from "../lib/text.js";
 import { Ball, ColliedDir } from "./ball.js";
 
@@ -13,14 +15,15 @@ export class Game extends Group{
     arrow: Image;
     GAME_STATE: number = GameState.UNPLAYED;
     startText: Text;
+    setting: ButtonImage;
 
-    constructor(position: Vector2D, size: Size) {
-        super(position, size);
+    constructor(position: Vector2D, size: Size, groupScene: Scene) {
+        super(position, size, groupScene);
         this.style.borderColor = "rgb(0, 255, 255)";
         this.style.borderWidth = 2;
 
-        var txtX = this.position.x + this.size.width/2;
-        var txtY = this.position.y + this.size.height/2;
+        var txtX = this.size.width/2;
+        var txtY = this.size.height/2;
         this.startText = new Text(new Vector2D(txtX, txtY), "Start!");
         
         //init Paddel
@@ -126,9 +129,12 @@ export class Game extends Group{
         });
         
         this.event.onClick((e: MouseEvent) => {
-            this.GAME_STATE = GameState.RUNNING;
-            this.remove(this.arrow);
-            this.remove(this.startText);
+            if(this.GAME_STATE == GameState.PAUSE || this.GAME_STATE == GameState.UNPLAYED) {
+                this.GAME_STATE = GameState.RUNNING;
+                this.remove(this.arrow);
+                this.remove(this.startText);
+            }
+            console.log(true);
         });
     }
 

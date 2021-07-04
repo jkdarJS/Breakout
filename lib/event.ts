@@ -1,5 +1,7 @@
 import { Node } from "./node.js";
 
+type ActionType = "mousedown" | "mousemove" | "mouseup" | "click";
+
 export class Event {
     canvas: HTMLCanvasElement;
     node: Node;
@@ -13,6 +15,10 @@ export class Event {
         const ctx = this.canvas.getContext("2d");
         const path = this.node.getPath();
 
+        if(!this.node.visibility) { return false; }
+        if(!this.node.parent.visibility) { return false; }
+        
+
         if(ctx.isPointInPath(path, mouseX, mouseY)) {
             return true;
         }
@@ -22,7 +28,7 @@ export class Event {
         return false;
     }
 
-    addEvent(type: string, callback: CallableFunction) {
+    addEvent(type: ActionType, callback: CallableFunction) {
         this.canvas.addEventListener(type, (event) => {
             var e = event as MouseEvent;
             const CANVAS_POS = this.canvas.getBoundingClientRect();

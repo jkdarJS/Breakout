@@ -5,15 +5,15 @@ import { RoundRect } from "../lib/rectangle.js";
 import { Text } from "../lib/text.js";
 import { Ball, ColliedDir } from "./ball.js";
 export class Game extends Group {
-    constructor(position, size) {
-        super(position, size);
+    constructor(position, size, groupScene) {
+        super(position, size, groupScene);
         this.balls = [];
         this.particulars = [];
         this.GAME_STATE = GameState.UNPLAYED;
         this.style.borderColor = "rgb(0, 255, 255)";
         this.style.borderWidth = 2;
-        var txtX = this.position.x + this.size.width / 2;
-        var txtY = this.position.y + this.size.height / 2;
+        var txtX = this.size.width / 2;
+        var txtY = this.size.height / 2;
         this.startText = new Text(new Vector2D(txtX, txtY), "Start!");
         //init Paddel
         var playerX = (this.size.width - 100) / 2;
@@ -100,9 +100,12 @@ export class Game extends Group {
             }
         });
         this.event.onClick((e) => {
-            this.GAME_STATE = GameState.RUNNING;
-            this.remove(this.arrow);
-            this.remove(this.startText);
+            if (this.GAME_STATE == GameState.PAUSE || this.GAME_STATE == GameState.UNPLAYED) {
+                this.GAME_STATE = GameState.RUNNING;
+                this.remove(this.arrow);
+                this.remove(this.startText);
+            }
+            console.log(true);
         });
     }
     switchDir(ball) {

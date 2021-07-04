@@ -1,13 +1,19 @@
+import { Button, ButtonImage } from "../lib/button.js";
+import { Grid } from "../lib/grid.js";
 import { Group } from "../lib/group.js";
 import { Size, Vector2D } from "../lib/math.js";
 import { Scene } from "../lib/scene.js";
 import { Game, GameState } from "./game.js";
+import { Gui } from "./gui.js";
 
 
 var canvas: HTMLCanvasElement;
 var scene: Scene;
 var group: Group;
+var gui: Gui;
 var game: Game;
+var setting: ButtonImage;
+var grid: Grid;
 
 function init() {
     canvas = document.querySelector("canvas");
@@ -16,15 +22,32 @@ function init() {
 
     scene = new Scene(canvas);
 
-    group = new Group(new Vector2D(0, 0), new Size(canvas.width, canvas.height));
-    group.style.fillColor = "rgb(0, 0, 0)";
-
-    game = new Game(new Vector2D((canvas.width-400)/2, (canvas.height-700)/2), new Size(400, 700));
+    group = new Group(new Vector2D(0, 0), new Size(canvas.width, canvas.height), scene);
+    group.style.fillColor = "rgb(30, 30, 30)";
     
+
+    game = new Game(new Vector2D((canvas.width-350)/2, (canvas.height-650)/2), new Size(350, 700), scene);
+
+    gui = new Gui(new Vector2D(0, 0), group.size, scene, game);
+    gui.visibility = false;
+
+    setting = new ButtonImage(new Vector2D(10, 25), new Size(50, 50), "../assets/setting-filled.png");
+    setting.style.borderWidth = 0;
+    
+    setting.event.onClick(() =>{
+        if(game.GAME_STATE != GameState.PAUSE) {
+            game.GAME_STATE = GameState.PAUSE;
+            game.add(game.startText);
+        }
+    });
+
+    // group.add(game);
+    group.add(setting);
+    group.add(gui);
     group.add(game);
     scene.add(group);
 
-    scene.show();
+    scene.show();    
 
     function update() {
         scene.hide();

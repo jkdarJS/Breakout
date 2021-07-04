@@ -1,7 +1,6 @@
 import { Group } from "./group.js";
 import { Image } from "./image.js";
 import { Node } from "./node.js";
-import { Rectangle } from "./rectangle.js";
 
 export class Drawer {
     ctx: CanvasRenderingContext2D;
@@ -30,7 +29,7 @@ export class Drawer {
             this.ctx.translate(-(parentPos.x + parentRotateAngle.x), -(parentPos.y + parentRotateAngle.y));
             this.ctx.clip(parent.getPath());
         }
-
+        
         this.ctx.translate(pos.x + rotateAngel.x, pos.y + rotateAngel.y);
         this.ctx.rotate(this.degrees(style.rotation));
         this.ctx.translate(-(pos.x + rotateAngel.x), -(pos.y + rotateAngel.y));
@@ -51,8 +50,6 @@ export class Drawer {
     }
 
     draw(node: Node): void{
-        const style = node.style;
-        const path = node.getPath();
         this.setStyle(node);
         node.draw(this);
         this.ctx.restore();

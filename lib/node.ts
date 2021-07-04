@@ -14,6 +14,7 @@ export class Node implements NodeConfig{
     parent?: Group;
     scene?: Scene;
     event: Event;
+    visibility: boolean = true;
     
     constructor(position: Vector2D | Vector2DConfig) {
         this.position = position;
